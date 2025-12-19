@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import ControlPanel from "./components/ControlPanel";
 import Playback from "./components/Playback";
@@ -9,10 +10,10 @@ export default function HomePage() {
   const [tempo, setTempo] = useState<number>(100);
   const [meter, setMeter] = useState<string>("4/4");
   const [numMeasures, setNumMeasures] = useState<number>(2);
-  const [melody, setMelody] = useState(generateMelody(meter, numMeasures));
+  const [melody, setMelody] = useState(generateMelody());
 
   const handleGenerateMelody = () => {
-    setMelody(generateMelody(meter, numMeasures));
+    setMelody(generateMelody());
   };
 
   return (
@@ -27,7 +28,7 @@ export default function HomePage() {
         onGenerateMelody={handleGenerateMelody}
       />
 
-      <Staff melody={melody} meter={meter} numMeasures={numMeasures} />
+      <Staff melody={melody} meter={{ beats: 4, beatUnit: 4 }} />
       <Playback melody={melody} tempo={tempo} />
     </main>
   );

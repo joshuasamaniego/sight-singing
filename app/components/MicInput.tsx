@@ -28,12 +28,6 @@ export default function MicInput({
   const [lastNoteIndex, setLastNoteIndex] = useState<number | null>(null);
   const [clarity, setClarity] = useState<number | null>(null);
 
-  useEffect(() => {
-    return () => {
-      stop();
-    };
-  }, []);
-
   const start = async () => {
     if (listening) return;
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -48,8 +42,8 @@ export default function MicInput({
 
     // Create detector
     detectorRef.current = PitchDetector.forFloat32Array(
-      analyser.fftSize,
-      audioCtx.sampleRate
+      analyser.fftSize
+      // audioCtx.sampleRate
     );
 
     setListening(true);
@@ -118,6 +112,12 @@ export default function MicInput({
 
     rafRef.current = requestAnimationFrame(tick);
   };
+
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+  }, []);
 
   return (
     <div style={{ textAlign: "center", marginTop: 16 }}>
