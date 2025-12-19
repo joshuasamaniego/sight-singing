@@ -3,7 +3,7 @@ name: Deploy to Dreamhost
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -12,8 +12,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        fetch-depth: 0  # Get full history for Git
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build Next.js app
+      run: npm run build
 
     - name: Setup SSH
       run: |
@@ -22,17 +32,12 @@ jobs:
         chmod 600 ~/.ssh/dreamhost_key
         ssh-keyscan -H ${{ secrets.DREAMHOST_HOST }} >> ~/.ssh/known_hosts
     
-    - name: Configure Git
+    - name: Deploy to Dreamhost via rsync
       run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-    
-    - name: Deploy to Dreamhost
-      run: |
-        git remote add dreamhost ssh://${{ secrets.DREAMHOST_USERNAME }}@${{ secrets.DREAMHOST_HOST }}/~/joshuasamaniego.com.git || true
-        git push dreamhost main --force
-      env:
-        GIT_SSH_COMMAND: "ssh -i ~/.ssh/dreamhost_key -o StrictHostKeyChecking=no"
+        rsync -avz --delete \
+          -e "ssh -i ~/.ssh/dreamhost_key -o StrictHostKeyChecking=no" \
+          out/ \
+          ${{ secrets.DREAMHOST_USERNAME }}@${{ secrets.DREAMHOST_HOST }}:~/joshuasamaniego.com/
     
     - name: Deployment successful
       run: |
