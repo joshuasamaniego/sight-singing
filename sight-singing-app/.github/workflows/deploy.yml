@@ -1,0 +1,40 @@
+name: Deploy to Dreamhost
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Get full history for Git
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DREAMHOST_SSH_KEY }}" > ~/.ssh/dreamhost_key
+        chmod 600 ~/.ssh/dreamhost_key
+        ssh-keyscan -H ${{ secrets.DREAMHOST_HOST }} >> ~/.ssh/known_hosts
+    
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+    
+    - name: Deploy to Dreamhost
+      run: |
+        git remote add dreamhost ssh://${{ secrets.DREAMHOST_USERNAME }}@${{ secrets.DREAMHOST_HOST }}/~/joshuasamaniego.com.git || true
+        git push dreamhost main --force
+      env:
+        GIT_SSH_COMMAND: "ssh -i ~/.ssh/dreamhost_key -o StrictHostKeyChecking=no"
+    
+    - name: Deployment successful
+      run: |
+        echo "🚀 Successfully deployed to joshuasamaniego.com!"
+        echo "Your site should be live at: https://joshuasamaniego.com"
