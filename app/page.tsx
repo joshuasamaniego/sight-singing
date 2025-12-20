@@ -18,6 +18,8 @@ export default function HomePage() {
 
   return (
     <main style={{ padding: 20 }}>
+      <h1>WOOOHOOO IT WORKED!</h1>
+      <span>Im so amazing :)</span>
       <ControlPanel
         tempo={tempo}
         meter={meter}
