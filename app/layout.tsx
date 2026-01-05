@@ -1,14 +1,7 @@
 "use client";
 
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: { main: "#1976d2" },
-    secondary: { main: "#9c27b0" },
-  },
-});
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { theme } from "./theme/theme";
 
 export default function RootLayout({
   children,

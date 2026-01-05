@@ -1,7 +1,6 @@
 "use client";
 import {
   Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -9,8 +8,10 @@ import {
   Slider,
   Stack,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
+import { NeumorphicButton } from "./neumorphic-components/NeumorphicButton";
 
 type Props = {
   tempo: number;
@@ -31,6 +32,7 @@ export default function ControlPanel({
   onNumMeasuresChange,
   onGenerateMelody,
 }: Props) {
+  const theme = useTheme();
   const [localTempo, setLocalTempo] = useState(tempo);
 
   const handleTempoChange = (_: Event, value: number | number[]) => {
@@ -40,7 +42,13 @@ export default function ControlPanel({
   };
 
   return (
-    <Box sx={{ p: 2, borderRadius: 2, bgcolor: "#f9f9f9", boxShadow: 1 }}>
+    <Box
+      sx={{
+        ...theme.neumorphic.panel.flat,
+        padding: 3,
+        marginTop: 3,
+      }}
+    >
       <Stack spacing={3}>
         {/* TEMPO */}
         <Box>
@@ -86,14 +94,9 @@ export default function ControlPanel({
         </FormControl>
 
         {/* GENERATE BUTTON */}
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={onGenerateMelody}
-          sx={{ mt: 2 }}
-        >
+        <NeumorphicButton onClick={onGenerateMelody} sx={{ mt: 2 }}>
           🎲 Generate New Melody
-        </Button>
+        </NeumorphicButton>
       </Stack>
     </Box>
   );

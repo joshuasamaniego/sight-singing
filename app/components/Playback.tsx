@@ -1,11 +1,11 @@
 "use client";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import { useRef, useState } from "react";
 import * as Tone from "tone";
 import { MelodyNote } from "../utils/melodyGenerator";
 import { noteNameToFrequency } from "../utils/noteUtils";
+import { NeumorphicButton } from "./neumorphic-components/NeumorphicButton";
 
 type Props = {
   melody: MelodyNote[];
@@ -88,13 +88,9 @@ export default function Playback({ melody, tempo, onSchedule }: Props) {
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      <Button
-        variant={isPlaying ? "contained" : "outlined"}
-        color={isPlaying ? "error" : "primary"}
-        onClick={togglePlayback}
-      >
+      <NeumorphicButton onClick={togglePlayback}>
         {isPlaying ? "Stop Playback" : "Play Melody"}
-      </Button>
+      </NeumorphicButton>
 
       {/* 🔴 Metronome LED */}
       <Box

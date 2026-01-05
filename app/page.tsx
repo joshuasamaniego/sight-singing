@@ -1,5 +1,6 @@
 "use client";
 
+import { Box, useTheme } from "@mui/material";
 import { useState } from "react";
 import ControlPanel from "./components/ControlPanel";
 import Playback from "./components/Playback";
@@ -7,6 +8,7 @@ import Staff from "./components/Staff";
 import { generateMelody } from "./utils/melodyGenerator";
 
 export default function HomePage() {
+  const theme = useTheme();
   const [tempo, setTempo] = useState<number>(100);
   const [meter, setMeter] = useState<string>("4/4");
   const [numMeasures, setNumMeasures] = useState<number>(2);
@@ -28,8 +30,17 @@ export default function HomePage() {
         onGenerateMelody={handleGenerateMelody}
       />
 
-      <Staff melody={melody} meter={{ beats: 4, beatUnit: 4 }} />
-      <Playback melody={melody} tempo={tempo} />
+      <Box
+        sx={{
+          ...theme.neumorphic.panel.flat,
+          padding: 3,
+          marginTop: 3,
+        }}
+      >
+        <Staff melody={melody} meter={{ beats: 4, beatUnit: 4 }} />
+
+        <Playback melody={melody} tempo={tempo} />
+      </Box>
     </main>
   );
 }
