@@ -16,20 +16,16 @@ import { NeumorphicButton } from "./neumorphic-components/NeumorphicButton";
 type Props = {
   tempo: number;
   meter: string;
-  numMeasures: number;
   onTempoChange: (newTempo: number) => void;
   onMeterChange: (newMeter: string) => void;
-  onNumMeasuresChange: (newCount: number) => void;
   onGenerateMelody: () => void;
 };
 
 export default function ControlPanel({
   tempo,
   meter,
-  numMeasures,
   onTempoChange,
   onMeterChange,
-  onNumMeasuresChange,
   onGenerateMelody,
 }: Props) {
   const theme = useTheme();
@@ -46,13 +42,24 @@ export default function ControlPanel({
       sx={{
         ...theme.neumorphic.panel.flat,
         padding: 3,
-        marginTop: 3,
+        height: "100%",
+        minHeight: "400px",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <Stack spacing={3}>
-        {/* TEMPO */}
+      <Stack spacing={3} sx={{ flex: 1 }}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", color: theme.customColors.text.primary }}
+        >
+          Settings
+        </Typography>
+
         <Box>
-          <Typography gutterBottom>Tempo: {localTempo} BPM</Typography>
+          <Typography gutterBottom sx={{ fontSize: "0.9rem" }}>
+            Tempo: {localTempo} BPM
+          </Typography>
           <Slider
             value={localTempo}
             onChange={handleTempoChange}
@@ -63,7 +70,6 @@ export default function ControlPanel({
           />
         </Box>
 
-        {/* METER */}
         <FormControl fullWidth>
           <InputLabel>Meter</InputLabel>
           <Select
@@ -77,24 +83,15 @@ export default function ControlPanel({
           </Select>
         </FormControl>
 
-        {/* NUMBER OF MEASURES */}
-        <FormControl fullWidth>
-          <InputLabel>Number of Measures</InputLabel>
-          <Select
-            value={numMeasures}
-            label="Number of Measures"
-            onChange={(e) => onNumMeasuresChange(Number(e.target.value))}
-          >
-            {[1, 2, 3, 4].map((n) => (
-              <MenuItem key={n} value={n}>
-                {n}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* GENERATE BUTTON */}
-        <NeumorphicButton onClick={onGenerateMelody} sx={{ mt: 2 }}>
+        <NeumorphicButton
+          onClick={onGenerateMelody}
+          sx={{
+            color: theme.customColors.primary,
+            fontWeight: "bold",
+            fontSize: "1rem",
+            marginTop: "auto",
+          }}
+        >
           🎲 Generate New Melody
         </NeumorphicButton>
       </Stack>

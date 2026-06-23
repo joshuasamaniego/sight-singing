@@ -1,46 +1,87 @@
 "use client";
 
 import { Box, useTheme } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ControlPanel from "./components/ControlPanel";
-import Playback from "./components/Playback";
-import Staff from "./components/Staff";
-import { generateMelody } from "./utils/melodyGenerator";
+import MelodyInfo from "./components/MelodyInfo";
+import SheetMusicDisplay from "./components/SheetMusicDisplay";
+import { playMelody, stopAudio } from "./utils/audioPlayer";
+import { generateMelody, Melody } from "./utils/melodyGenerator";
 
-export default function HomePage() {
+export default function Home() {
   const theme = useTheme();
-  const [tempo, setTempo] = useState<number>(100);
-  const [meter, setMeter] = useState<string>("4/4");
-  const [numMeasures, setNumMeasures] = useState<number>(2);
-  const [melody, setMelody] = useState(generateMelody());
+  const [tempo, setTempo] = useState(120);
+  const [meter, setMeter] = useState("4/4");
+  const [currentMelody, setCurrentMelody] = useState<Melody | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [captureResult, setCaptureResult] = useState<{
+    cents: number;
+    message: string;
+  } | null>(null);
+  const playbackRef = useRef<Promise<void> | null>(null);
 
   const handleGenerateMelody = () => {
-    setMelody(generateMelody());
+    setIsPlaying(false);
+    stopAudio();
+    setCaptureResult(null);
+    const newMelody = generateMelody();
+    setCurrentMelody(newMelody);
+  };
+
+  const handlePlay = async () => {
+    if (!currentMelody) return;
+    setIsPlaying(true);
+    try {
+      playbackRef.current = playMelody(currentMelody, { tempo, gain: 0.3 });
+      await playbackRef.current;
+    } finally {
+      setIsPlaying(false);
+    }
+  };
+
+  const handleStop = () => {
+    setIsPlaying(false);
+    stopAudio();
+    playbackRef.current = null;
+  };
+
+  const handleVoiceCaptured = (cents: number, message: string) => {
+    setCaptureResult({ cents, message });
   };
 
   return (
-    <main style={{ padding: 20 }}>
-      <ControlPanel
-        tempo={tempo}
-        meter={meter}
-        numMeasures={numMeasures}
-        onTempoChange={setTempo}
-        onMeterChange={setMeter}
-        onNumMeasuresChange={setNumMeasures}
-        onGenerateMelody={handleGenerateMelody}
-      />
-
+    <Box
+      sx={{
+        background: theme.customColors.background.main,
+        minHeight: "100vh",
+        padding: 4,
+      }}
+    >
       <Box
         sx={{
-          ...theme.neumorphic.panel.flat,
-          padding: 3,
-          marginTop: 3,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: 3,
         }}
       >
-        <Staff melody={melody} meter={{ beats: 4, beatUnit: 4 }} />
+        <ControlPanel
+          tempo={tempo}
+          meter={meter}
+          onTempoChange={setTempo}
+          onMeterChange={setMeter}
+          onGenerateMelody={handleGenerateMelody}
+        />
 
-        <Playback melody={melody} tempo={tempo} />
+        <SheetMusicDisplay
+          melody={currentMelody}
+          isPlaying={isPlaying}
+          onPlay={handlePlay}
+          onStop={handleStop}
+          onVoiceCaptured={handleVoiceCaptured}
+        />
+
+        <MelodyInfo melody={currentMelody} captureResult={captureResult} />
       </Box>
-    </main>
+    </Box>
   );
 }
